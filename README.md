@@ -1,4 +1,4 @@
-node-static
+azure-node-static
 ===========
 
 > a simple, *rfc 2616 compliant* file streaming module for [node](http://nodejs.org)
