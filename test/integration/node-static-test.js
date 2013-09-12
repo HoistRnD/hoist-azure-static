@@ -1,15 +1,19 @@
 var vows    = require('vows')
   , request = require('request')
   , assert  = require('assert')
-  , static  = require('../../lib/node-static');
+  , static  = require('../../lib/node-static')
 
-var fileServer  = new static.Server(__dirname + '/../fixtures');
+var TEST_STORAGE_ACCOUNT = 'hoistteststorage';
+var TEST_STORAGE_ACCESS_KEY = 'x3OEKsm7Mk7Cvl+4XRf2lAYx5rnbzc1AHbbhCP2/GNu1S59wajKFrhGyoNhBSqHbrWpHkdCwbUP9ArDX6MMUdg==';
+
+var fileServer  = new static.Server(TEST_STORAGE_ACCOUNT,TEST_STORAGE_ACCESS_KEY);
 var suite       = vows.describe('node-static');
 var TEST_PORT   = 8080;
 var TEST_SERVER = 'http://localhost:' + TEST_PORT;
 var version     = static.version.join('.');
 var server;
 var callback;
+
 
 headers = {
   'requesting headers': {
@@ -26,12 +30,16 @@ suite.addBatch({
   'once an http server is listening with a callback': {
     topic: function () {
       server = require('http').createServer(function (request, response) {
+      
         fileServer.serve(request, response, function(err, result) {
+
           if (callback)
             callback(request, response, err, result);
           else
             request.end();
         });
+      
+
       }).listen(TEST_PORT, this.callback)
     },
     'should be listening' : function(){
@@ -51,6 +59,7 @@ suite.addBatch({
             }, 100);
           }
         }
+
         request.get(TEST_SERVER + '/not-found', this.callback);
       },
       'should respond with 404' : function(error, response, body){
